@@ -21,13 +21,14 @@ public class PlayerController : MonoBehaviour
         if(InAir == false)
         {
         rb.AddForce(UnityEngine.Vector2.up * jumpHeight, ForceMode2D.Impulse);
+        Debug.Log("jump");
         InAir = true;
         }
     }
     private void OnMove(InputValue inputValue)
     {
         UnityEngine.Vector2 input = inputValue.Get<UnityEngine.Vector2>();
-
+        Debug.Log("move");
         rb.linearVelocity = new UnityEngine.Vector2(input.x * moveSpeed, rb.linearVelocity.y);
     }
     private void OnCollisionEnter2D(Collision2D collision)
