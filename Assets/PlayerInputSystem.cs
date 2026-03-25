@@ -127,6 +127,15 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SwitchTimeline"",
+                    ""type"": ""Button"",
+                    ""id"": ""84a98f8a-0781-41ce-a359-7e282ded3dc5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -206,6 +215,17 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
                     ""action"": ""WallJump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""df1ef0af-3238-4ad2-bdb5-a8dc206d1b94"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SwitchTimeline"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -218,6 +238,7 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
         m_Player_WallJump = m_Player.FindAction("WallJump", throwIfNotFound: true);
+        m_Player_SwitchTimeline = m_Player.FindAction("SwitchTimeline", throwIfNotFound: true);
     }
 
     ~@PlayerInputSystem()
@@ -302,6 +323,7 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Dash;
     private readonly InputAction m_Player_WallJump;
+    private readonly InputAction m_Player_SwitchTimeline;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -329,6 +351,10 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/WallJump".
         /// </summary>
         public InputAction @WallJump => m_Wrapper.m_Player_WallJump;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/SwitchTimeline".
+        /// </summary>
+        public InputAction @SwitchTimeline => m_Wrapper.m_Player_SwitchTimeline;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -367,6 +393,9 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
             @WallJump.started += instance.OnWallJump;
             @WallJump.performed += instance.OnWallJump;
             @WallJump.canceled += instance.OnWallJump;
+            @SwitchTimeline.started += instance.OnSwitchTimeline;
+            @SwitchTimeline.performed += instance.OnSwitchTimeline;
+            @SwitchTimeline.canceled += instance.OnSwitchTimeline;
         }
 
         /// <summary>
@@ -390,6 +419,9 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
             @WallJump.started -= instance.OnWallJump;
             @WallJump.performed -= instance.OnWallJump;
             @WallJump.canceled -= instance.OnWallJump;
+            @SwitchTimeline.started -= instance.OnSwitchTimeline;
+            @SwitchTimeline.performed -= instance.OnSwitchTimeline;
+            @SwitchTimeline.canceled -= instance.OnSwitchTimeline;
         }
 
         /// <summary>
@@ -458,5 +490,12 @@ public partial class @PlayerInputSystem: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnWallJump(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SwitchTimeline" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSwitchTimeline(InputAction.CallbackContext context);
     }
 }

@@ -23,9 +23,12 @@ public class PlayerController : MonoBehaviour
     private bool CanDash = true;
     private bool IsDashing = false;
 
-
     private Vector2 moveInput;
     private float lastFacingDirection = 1f;
+
+    [Header("Timeline Switching")]
+    public GameObject timelineA;
+    public GameObject timelineB;
 
     [SerializeField] private float dashSpeed = 10f;
     [SerializeField] private float dashingTime = 0.3f;
@@ -35,7 +38,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float groundDeceleration = 20f;
     [SerializeField] private float wallSlideSpeed = 2f;
     
-    [SerializeField] Transform  wallCheck;
+    [SerializeField] Transform wallCheck;
     [SerializeField] LayerMask wallLayer;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
@@ -45,7 +48,12 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponentInChildren<Rigidbody2D>();
         tr = GetComponent<TrailRenderer>();
+
+        // Start with timeline A active
+        if (timelineA != null) timelineA.SetActive(true);
+        if (timelineB != null) timelineB.SetActive(false);
     }
+
     void Update()
     {
         horizontal = moveInput.x;
@@ -55,11 +63,11 @@ public class PlayerController : MonoBehaviour
             Flip();
         }
     }
+
     void FixedUpdate()
     {
-
         if (IsDashing || isWallJumping)
-        return;
+            return;
 
         if (Mathf.Abs(moveInput.x) > 0.01f)
         {
@@ -68,13 +76,26 @@ public class PlayerController : MonoBehaviour
         }
         else if (IsGrounded())
         {
-            float newX = Mathf.MoveTowards(rb.linearVelocity.x, 0f, groundDeceleration * Time.fixedDeltaTime);
+            float newX = Mathf.MoveTowards(
+                rb.linearVelocity.x,
+                0f,
+                groundDeceleration * Time.fixedDeltaTime
+            );
+
             rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
         }
+
         if (IsWalled())
         {
-          WallSlide();  
+            WallSlide();
         }
+    }
+
+    // ================= INPUT SYSTEM =================
+
+    private void OnMove(InputValue inputValue)
+    {
+        moveInput = inputValue.Get<Vector2>();
     }
 
     private void OnJump()
@@ -83,20 +104,14 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpHeight);
         }
-        else if (!IsGrounded())
+        else
         {
             StartCoroutine(WallJump());
         }
     }
 
-    private void OnMove(InputValue inputValue)
-    {
-        moveInput = inputValue.Get<Vector2>();
-    }
-
     private void OnDash(InputValue inputValue)
     {
-
         if (CanDash)
         {
             Vector2 dashDirection;
@@ -109,57 +124,91 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(Dash(dashDirection));
         }
     }
-        private void WallSlide()
-    {
 
+    // Timeline switch using Input System
+    private void OnSwitchTimeline()
+    {
+        if (TimelineManager.Instance != null)
+        {
+            TimelineManager.Instance.SwitchTimeline();
+        }
+    }
+
+    // ================= WALL =================
+
+    private void WallSlide()
+    {
         if (!IsGrounded() && horizontal != 0f)
         {
             isWallSliding = true;
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Clamp(rb.linearVelocity.y, -wallSlidingSpeed, float.MaxValue));
+
+            rb.linearVelocity = new Vector2(
+                rb.linearVelocity.x,
+                Mathf.Clamp(rb.linearVelocity.y, -wallSlidingSpeed, float.MaxValue)
+            );
         }
         else
         {
             isWallSliding = false;
         }
     }
+
     private IEnumerator WallJump()
     {
-        if(isWallSliding)
+        if (isWallSliding)
         {
-
             isWallJumping = true;
+
             wallJumpingDirection = -transform.localScale.x;
-            rb.linearVelocity = new Vector2(wallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
-            wallJumpingCounter = 0f;
+
+            rb.linearVelocity =
+                new Vector2(
+                    wallJumpingDirection * wallJumpingPower.x,
+                    wallJumpingPower.y
+                );
 
             if (transform.localScale.x != wallJumpingDirection)
             {
                 isFacingRight = !isFacingRight;
+
                 Vector3 localScale = transform.localScale;
                 localScale.x *= -1f;
                 transform.localScale = localScale;
             }
+
             yield return new WaitForSeconds(wallJumpingDuration);
+
             StopWallJumping();
             isWallSliding = false;
         }
     }
+
     private void StopWallJumping()
     {
         isWallJumping = false;
     }
 
+    // ================= CHECKS =================
 
-   private bool IsGrounded()
+    private bool IsGrounded()
     {
-        return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
-    
+        return Physics2D.OverlapCircle(
+            groundCheck.position,
+            0.2f,
+            groundLayer
+        );
     }
 
     private bool IsWalled()
     {
-        return Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
+        return Physics2D.OverlapCircle(
+            wallCheck.position,
+            0.2f,
+            wallLayer
+        );
     }
+
+    // ================= DASH =================
 
     private IEnumerator Dash(Vector2 input)
     {
@@ -170,28 +219,39 @@ public class PlayerController : MonoBehaviour
         rb.gravityScale = 0f;
 
         rb.linearVelocity = new Vector2(input.x * dashSpeed, 0f);
+
         tr.emitting = true;
 
         yield return new WaitForSeconds(dashingTime);
 
         tr.emitting = false;
+
         rb.gravityScale = originalGravity;
+
         IsDashing = false;
 
         if (IsGrounded())
         {
-            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            rb.linearVelocity =
+                new Vector2(0f, rb.linearVelocity.y);
         }
 
         yield return new WaitForSeconds(dashCooldown);
+
         CanDash = true;
     }
 
+    // ================= FLIP =================
+
     private void Flip()
     {
-        if (isFacingRight && horizontal < 0f || !isFacingRight && horizontal > 0f)
+        if (
+            isFacingRight && horizontal < 0f ||
+            !isFacingRight && horizontal > 0f
+        )
         {
             isFacingRight = !isFacingRight;
+
             Vector3 localScale = transform.localScale;
             localScale.x *= -1f;
             transform.localScale = localScale;
