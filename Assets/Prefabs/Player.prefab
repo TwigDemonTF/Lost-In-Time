@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 1942400377907971605}
   - component: {fileID: 5237324722336492216}
   - component: {fileID: 2245366970671828252}
+  - component: {fileID: 4798867114571095034}
   m_Layer: 0
   m_Name: PlayerBody
   m_TagString: Player
@@ -61,7 +62,7 @@ Transform:
   m_GameObject: {fileID: 1732521078883753647}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.08, y: 1.09, z: 0}
+  m_LocalPosition: {x: 0.235, y: 1.2074, z: 0}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -124,7 +125,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -168,7 +169,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
+    newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -351,6 +352,41 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &4798867114571095034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1732521078883753647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6795a89b3bbfe52458b3bbfcefcea059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  timelineA: {fileID: 0}
+  timelineB: {fileID: 0}
+  dashSpeed: 20
+  dashingTime: 0.3
+  dashCooldown: 1
+  moveSpeed: 5
+  groundAcceleration: 60
+  airAcceleration: 20
+  groundDeceleration: 20
+  wallSlideSpeed: 2
+  tapJumpHeight: 6
+  holdJumpForce: 15
+  maxHoldTime: 0.3
+  fallGravityMultiplier: 2.5
+  lowJumpGravityMultiplier: 2
+  wallCheck: {fileID: 1804327100356719740}
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  groundCheck: {fileID: 7445952181034379038}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &4588737335533558237
 GameObject:
   m_ObjectHideFlags: 0
@@ -360,7 +396,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4936386764134600309}
-  - component: {fileID: 5912823734071097462}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -385,33 +420,6 @@ Transform:
   - {fileID: 8498485787115066015}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5912823734071097462
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4588737335533558237}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6795a89b3bbfe52458b3bbfcefcea059, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  dashSpeed: 10
-  dashingTime: 0.3
-  dashCooldown: 1
-  moveSpeed: 5
-  jumpHeight: 5
-  groundDeceleration: 20
-  wallSlideSpeed: 2
-  wallCheck: {fileID: 1804327100356719740}
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  groundCheck: {fileID: 7445952181034379038}
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 128
 --- !u!1 &6176243415304640223
 GameObject:
   m_ObjectHideFlags: 0
@@ -530,7 +538,7 @@ Transform:
   m_GameObject: {fileID: 6249846655370736477}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.08, y: 1.09, z: -10}
+  m_LocalPosition: {x: 0.235, y: 1.2074, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

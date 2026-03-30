@@ -7,22 +7,29 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    // Misc
     private Rigidbody2D rb;
     private TrailRenderer tr;
     private float horizontal;
     private bool isFacingRight = true;
+    private PlayerInputSystem controls;
+
+    // WallSliding
     private bool isWallSliding;
     private float wallSlidingSpeed = 2f;
-
+    // WallJumping
     private bool isWallJumping;
     private float wallJumpingDirection = 0.4f;
-    private float wallJumpingTime = 0.2f;
-    private float wallJumpingCounter;
     private float wallJumpingDuration = 0.4f;
-    private Vector2 wallJumpingPower = new Vector2(4f, 7f);    
+    private Vector2 wallJumpingPower = new Vector2(7f, 9f); 
+
+    // dash   
     private bool CanDash = true;
     private bool IsDashing = false;
-
+    // jump
+    private bool isJumping;
+    private bool jumpHeld;
+    private float jumpHoldCounter;
     private Vector2 moveInput;
     private float lastFacingDirection = 1f;
 
@@ -34,16 +41,55 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dashingTime = 0.3f;
     [SerializeField] private float dashCooldown = 1f;
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float jumpHeight = 5f;
+    [SerializeField] private float groundAcceleration = 60f;
+    [SerializeField] private float airAcceleration = 20f;
     [SerializeField] private float groundDeceleration = 20f;
     [SerializeField] private float wallSlideSpeed = 2f;
+    [SerializeField] private float tapJumpHeight = 5f;
+    [SerializeField] private float holdJumpForce = 10f;
+    [SerializeField] private float maxHoldTime = 0.2f;
+
+    // gravity
+    [SerializeField] private float fallGravityMultiplier = 2.5f;
+    [SerializeField] private float lowJumpGravityMultiplier = 2f;
     
     [SerializeField] Transform wallCheck;
     [SerializeField] LayerMask wallLayer;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
 
+    private void Awake()
+    {
+        controls = new PlayerInputSystem();
+    }
+    private void OnEnable()
+    {
+        controls.Player.Enable();
 
+        controls.Player.Move.performed += OnMove;
+        controls.Player.Move.canceled += OnMove;
+
+        controls.Player.Jump.started += OnJump;
+        controls.Player.Jump.canceled += OnJump;
+
+        controls.Player.Dash.started += OnDash;
+
+        controls.Player.SwitchTimeline.started += OnSwitchTimeline;
+    }
+    private void OnDisable()
+    {
+        controls.Player.Move.performed -= OnMove;
+        controls.Player.Move.canceled -= OnMove;
+
+        controls.Player.Jump.started -= OnJump;
+        controls.Player.Jump.canceled -= OnJump;
+
+        controls.Player.Dash.started -= OnDash;
+
+        controls.Player.SwitchTimeline.started -= OnSwitchTimeline;
+
+        controls.Player.Disable();
+    }
     void Start()
     {
         rb = GetComponentInChildren<Rigidbody2D>();
@@ -62,24 +108,70 @@ public class PlayerController : MonoBehaviour
         {
             Flip();
         }
+if (isJumping && jumpHeld)
+    {
+        if (jumpHoldCounter > 0)
+        {
+            rb.linearVelocity = new Vector2(
+                rb.linearVelocity.x,
+                rb.linearVelocity.y + holdJumpForce * Time.deltaTime
+            );
+
+            jumpHoldCounter -= Time.deltaTime;
+        }
+        else
+        {
+            isJumping = false;
+        }
+    }
+
+        if (!isWallJumping)
+        {
+            if (rb.linearVelocity.y < 0)
+            {
+                rb.linearVelocity += Vector2.up *
+                    Physics2D.gravity.y *
+                    (fallGravityMultiplier - 1) *
+                    Time.deltaTime;
+            }
+            else if (rb.linearVelocity.y > 0 && !jumpHeld)
+            {
+                rb.linearVelocity += Vector2.up *
+                    Physics2D.gravity.y *
+                    (lowJumpGravityMultiplier - 1) *
+                    Time.deltaTime;
+            }
+        }
     }
 
     void FixedUpdate()
     {
-        if (IsDashing || isWallJumping)
+        if (IsDashing)
             return;
+
+        float targetSpeed = moveInput.x * moveSpeed;
 
         if (Mathf.Abs(moveInput.x) > 0.01f)
         {
-            rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
+            float accelRate = IsGrounded() ? groundAcceleration : airAcceleration;
+
+            float newX = Mathf.MoveTowards(
+                rb.linearVelocity.x,
+                targetSpeed,
+                accelRate * Time.fixedDeltaTime
+            );
+
+            rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
             lastFacingDirection = Mathf.Sign(moveInput.x);
         }
-        else if (IsGrounded())
+        else
         {
+            float decelRate = IsGrounded() ? groundDeceleration : airAcceleration * 0.5f;
+
             float newX = Mathf.MoveTowards(
                 rb.linearVelocity.x,
                 0f,
-                groundDeceleration * Time.fixedDeltaTime
+                decelRate * Time.fixedDeltaTime
             );
 
             rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
@@ -93,24 +185,37 @@ public class PlayerController : MonoBehaviour
 
     // ================= INPUT SYSTEM =================
 
-    private void OnMove(InputValue inputValue)
+    private void OnMove(InputAction.CallbackContext context)
     {
-        moveInput = inputValue.Get<Vector2>();
+        moveInput = context.ReadValue<Vector2>();
+    }
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            if (IsGrounded())
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, tapJumpHeight);
+
+                isJumping = true;
+                jumpHeld = true;
+                jumpHoldCounter = maxHoldTime;
+            }
+            else
+            {
+                StartCoroutine(WallJump());
+            }
+        }
+
+        if (context.canceled)
+        {
+            jumpHeld = false;
+            isJumping = false;
+        }
+
     }
 
-    private void OnJump()
-    {
-        if (IsGrounded())
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpHeight);
-        }
-        else
-        {
-            StartCoroutine(WallJump());
-        }
-    }
-
-    private void OnDash(InputValue inputValue)
+    private void OnDash(InputAction.CallbackContext context)
     {
         if (CanDash)
         {
@@ -126,7 +231,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // Timeline switch using Input System
-    private void OnSwitchTimeline()
+    private void OnSwitchTimeline(InputAction.CallbackContext context)
     {
         if (TimelineManager.Instance != null)
         {
