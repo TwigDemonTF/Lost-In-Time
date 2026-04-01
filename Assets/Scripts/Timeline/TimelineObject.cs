@@ -4,9 +4,12 @@ public class TimelineObject : MonoBehaviour
 {
     public bool existsInPast = true;
     public bool existsInFuture = false;
+    private FutureObject futureObject;
 
     void Start()
     {
+        futureObject = GetComponent<FutureObject>();
+
         UpdateState(TimelineManager.Instance.currentTimeline);
         TimelineManager.Instance.OnTimelineChanged += UpdateState;
     }
@@ -17,7 +20,13 @@ public class TimelineObject : MonoBehaviour
             (timeline == TimelineManager.Timeline.Past && existsInPast) ||
             (timeline == TimelineManager.Timeline.Future && existsInFuture);
 
+        if (futureObject != null && futureObject.IsActivated)
+        {
+            shouldExist = false;
+        }
+
         gameObject.SetActive(shouldExist);
+        Debug.Log($"Updating {gameObject.name}, shouldExist: {shouldExist}");
     }
 
     void OnDestroy()

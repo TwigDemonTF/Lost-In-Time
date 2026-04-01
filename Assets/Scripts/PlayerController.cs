@@ -42,14 +42,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] LayerMask wallLayer;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
-
+    [SerializeField] private float interactRange = 3f;
+    [SerializeField] private LayerMask interactLayer;
+    [SerializeField] private GameObject interactTextPrefab;
+    private IInteractable currentInteractable;
+    private Collider2D currentCollider;
+    private GameObject currentTextInstance;
 
     void Start()
     {
         rb = GetComponentInChildren<Rigidbody2D>();
         tr = GetComponent<TrailRenderer>();
 
-        // Start with timeline A active
         if (timelineA != null) timelineA.SetActive(true);
         if (timelineB != null) timelineB.SetActive(false);
     }
@@ -57,6 +61,8 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         horizontal = moveInput.x;
+
+        CheckForInteractable();
 
         if (!isWallJumping)
         {
@@ -91,8 +97,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ================= INPUT SYSTEM =================
-
     private void OnMove(InputValue inputValue)
     {
         moveInput = inputValue.Get<Vector2>();
@@ -125,7 +129,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Timeline switch using Input System
     private void OnSwitchTimeline()
     {
         if (TimelineManager.Instance != null)
@@ -134,7 +137,54 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ================= WALL =================
+    private void OnInteract()
+    {
+        Debug.Log("Interact Pressed");
+        TryInteract();
+    }
+    private void TryInteract()
+    {
+        currentInteractable?.Interact();
+    }
+
+    private void CheckForInteractable()
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, interactRange, interactLayer);
+
+        Collider2D hit = null;
+        float closestDist = Mathf.Infinity;
+
+        foreach (var h in hits)
+        {
+            float dist = Vector2.Distance(transform.position, h.transform.position);
+
+            if (dist < closestDist)
+            {
+                closestDist = dist;
+                hit = h;
+            }
+        }
+
+        if (hit != currentCollider)
+        {
+            // Remove old highlight
+            if (currentCollider != null)
+            {
+                currentCollider.GetComponent<InteractableVisual>()?.SetHighlight(false);
+            }
+
+            currentCollider = hit;
+
+            if (hit != null)
+            {
+                currentInteractable = hit.GetComponent<IInteractable>();
+                hit.GetComponent<InteractableVisual>()?.SetHighlight(true);
+            }
+            else
+            {
+                currentInteractable = null;            }
+        }
+    }
 
     private void WallSlide()
     {
@@ -188,8 +238,6 @@ public class PlayerController : MonoBehaviour
         isWallJumping = false;
     }
 
-    // ================= CHECKS =================
-
     private bool IsGrounded()
     {
         return Physics2D.OverlapCircle(
@@ -207,8 +255,6 @@ public class PlayerController : MonoBehaviour
             wallLayer
         );
     }
-
-    // ================= DASH =================
 
     private IEnumerator Dash(Vector2 input)
     {
@@ -240,8 +286,6 @@ public class PlayerController : MonoBehaviour
 
         CanDash = true;
     }
-
-    // ================= FLIP =================
 
     private void Flip()
     {
