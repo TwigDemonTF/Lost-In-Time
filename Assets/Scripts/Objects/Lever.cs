@@ -11,8 +11,8 @@ public class Lever : MonoBehaviour, IInteractable
     {
         if (isActivated) return;
 
-        if (TimelineManager.Instance.currentTimeline != TimelineManager.Timeline.Past)
-            return;
+        // if (TimelineManager.Instance.currentTimeline != TimelineManager.Timeline.Past)
+        //     return;
 
         isActivated = true;
 

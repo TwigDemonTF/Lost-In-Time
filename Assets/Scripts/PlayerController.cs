@@ -81,6 +81,8 @@ public class PlayerController : MonoBehaviour
         controls.Player.Dash.started += OnDash;
 
         controls.Player.SwitchTimeline.started += OnSwitchTimeline;
+
+        controls.Player.Interact.started += OnInteract;
     }
     private void OnDisable()
     {
@@ -246,7 +248,7 @@ if (isJumping && jumpHeld)
         }
     }
 
-    private void OnInteract()
+    private void OnInteract(InputAction.CallbackContext context)
     {
         Debug.Log("Interact Pressed");
         TryInteract();
