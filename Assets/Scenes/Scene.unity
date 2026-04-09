@@ -119,40 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &18543287 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1732521078883753647, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
-  m_PrefabInstance: {fileID: 2368921640259277516}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &18543295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 18543287}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6795a89b3bbfe52458b3bbfcefcea059, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  timelineA: {fileID: 0}
-  timelineB: {fileID: 0}
-  dashSpeed: 20
-  dashingTime: 0.3
-  dashCooldown: 1
-  moveSpeed: 5
-  jumpHeight: 8
-  groundDeceleration: 20
-  wallSlideSpeed: 2
-  wallCheck: {fileID: 1807580193}
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  groundCheck: {fileID: 1311749407}
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 128
 --- !u!1 &43502012
 GameObject:
   m_ObjectHideFlags: 0
@@ -4723,6 +4689,22 @@ PrefabInstance:
       propertyPath: m_GravityScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4504267277621941163, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
+      propertyPath: wallCheck
+      value: 
+      objectReference: {fileID: 1807580193}
+    - target: {fileID: 4504267277621941163, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
+      propertyPath: groundCheck
+      value: 
+      objectReference: {fileID: 1311749407}
+    - target: {fileID: 4504267277621941163, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
+      propertyPath: wallLayer.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 4504267277621941163, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
+      propertyPath: groundLayer.m_Bits
+      value: 128
+      objectReference: {fileID: 0}
     - target: {fileID: 4588737335533558237, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
       propertyPath: m_Name
       value: Player
@@ -4767,22 +4749,23 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5237324722336492216, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
+      propertyPath: m_NotificationBehavior
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7445952181034379038, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.05
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7445952181034379038, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.501
+      value: -0.5
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 5912823734071097462, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
+    - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1732521078883753647, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 18543295}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6754296781d9891429c85bf8b16d89e0, type: 3}
 --- !u!1001 &4586691584505581347
 PrefabInstance:
@@ -4855,11 +4838,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3090483495044898143, guid: 4f612bb4faf3b764485a9b5b151a3fa8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.08
+      value: 0.235
       objectReference: {fileID: 0}
     - target: {fileID: 3090483495044898143, guid: 4f612bb4faf3b764485a9b5b151a3fa8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.09
+      value: 1.2074
       objectReference: {fileID: 0}
     - target: {fileID: 3090483495044898143, guid: 4f612bb4faf3b764485a9b5b151a3fa8, type: 3}
       propertyPath: m_LocalPosition.z

@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 321198595519207608}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.49, y: -0.224, z: 0}
+  m_LocalPosition: {x: 0.49, y: -0.036, z: 0}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 1942400377907971605}
   - component: {fileID: 5237324722336492216}
   - component: {fileID: 2245366970671828252}
-  - component: {fileID: 4798867114571095034}
+  - component: {fileID: 4504267277621941163}
   m_Layer: 0
   m_Name: PlayerBody
   m_TagString: Player
@@ -215,8 +215,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
-  m_Actions: {fileID: -944628639613478452, guid: 849243a32140ab440883230df43e84b2, type: 3}
-  m_NotificationBehavior: 0
+  m_Actions: {fileID: 0}
+  m_NotificationBehavior: 3
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
@@ -352,7 +352,7 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &4798867114571095034
+--- !u!114 &4504267277621941163
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -366,7 +366,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   timelineA: {fileID: 0}
   timelineB: {fileID: 0}
-  dashSpeed: 20
+  dashSpeed: 10
   dashingTime: 0.3
   dashCooldown: 1
   moveSpeed: 5
@@ -374,19 +374,19 @@ MonoBehaviour:
   airAcceleration: 20
   groundDeceleration: 20
   wallSlideSpeed: 2
-  tapJumpHeight: 6
-  holdJumpForce: 15
-  maxHoldTime: 0.3
+  tapJumpHeight: 7
+  holdJumpForce: 7
+  maxHoldTime: 0.2
   fallGravityMultiplier: 2.5
   lowJumpGravityMultiplier: 2
-  wallCheck: {fileID: 1804327100356719740}
+  wallCheck: {fileID: 0}
   wallLayer:
     serializedVersion: 2
-    m_Bits: 64
-  groundCheck: {fileID: 7445952181034379038}
+    m_Bits: 0
+  groundCheck: {fileID: 0}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 0
 --- !u!1 &4588737335533558237
 GameObject:
   m_ObjectHideFlags: 0
@@ -643,7 +643,7 @@ Transform:
   m_GameObject: {fileID: 8875468897162720692}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.08, y: -0.545, z: 0}
+  m_LocalPosition: {x: -0.015, y: -0.5, z: 0}
   m_LocalScale: {x: 1, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -297,22 +297,37 @@ if (isJumping && jumpHeld)
 
     private bool IsGrounded()
     {
-        return Physics2D.OverlapCircle(
+        return Physics2D.OverlapBox(
             groundCheck.position,
-            0.2f,
+            new Vector2(1f, 0.1f), 
+            0f,
             groundLayer
         );
     }
 
     private bool IsWalled()
     {
-        return Physics2D.OverlapCircle(
+        return Physics2D.OverlapBox(
             wallCheck.position,
-            0.2f,
+            new Vector2(0.1f, 1.5f), 
+            0f,
             wallLayer
         );
     }
+    private void OnDrawGizmosSelected()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(groundCheck.position, new Vector3(1f, 0.1f, 0f));
+        }
 
+        if (wallCheck != null)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireCube(wallCheck.position, new Vector3(0.1f, 1.5f, 0f));
+        }
+    }
     // ================= DASH =================
 
     private IEnumerator Dash(Vector2 input)
