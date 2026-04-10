@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Analytics;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -52,6 +53,23 @@ public class PlayerController : MonoBehaviour
     // gravity
     [SerializeField] private float fallGravityMultiplier = 2.5f;
     [SerializeField] private float lowJumpGravityMultiplier = 2f;
+
+    // AUDIO
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+
+    [SerializeField] private AudioClip jumpSound;
+    [SerializeField] private AudioClip wallJumpSound;
+    [SerializeField] private AudioClip dashSound;
+
+    // Walking sounds (per surface)
+    [SerializeField] private AudioClip grassStepSound;
+    [SerializeField] private AudioClip stoneStepSound;
+    [SerializeField] private UnityEngine.Tilemaps.Tilemap grassTilemap;
+    [SerializeField] private UnityEngine.Tilemaps.Tilemap stoneTilemap;
+
+    [SerializeField] private float stepInterval = 0.4f;
+    private float stepTimer;
     
     [SerializeField] Transform wallCheck;
     [SerializeField] LayerMask wallLayer;
@@ -60,7 +78,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float interactRange = 3f;
     [SerializeField] private LayerMask interactLayer;
     [SerializeField] private GameObject interactTextPrefab;
-    private IInteractable currentInteractable;
+    private SimpleInteract currentInteractable;
     private Collider2D currentCollider;
     private GameObject currentTextInstance;
 
@@ -107,8 +125,25 @@ public class PlayerController : MonoBehaviour
         if (timelineB != null) timelineB.SetActive(false);
     }
 
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, interactRange);
+    }
+
+    private void ReloadScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     void Update()
     {
+        HandleFootsteps();
+        if (Keyboard.current.f5Key.wasPressedThisFrame)
+        {
+            ReloadScene();
+        }
+
         horizontal = moveInput.x;
 
         CheckForInteractable();
@@ -117,22 +152,23 @@ public class PlayerController : MonoBehaviour
         {
             Flip();
         }
-if (isJumping && jumpHeld)
-    {
-        if (jumpHoldCounter > 0)
-        {
-            rb.linearVelocity = new Vector2(
-                rb.linearVelocity.x,
-                rb.linearVelocity.y + holdJumpForce * Time.deltaTime
-            );
 
-            jumpHoldCounter -= Time.deltaTime;
-        }
-        else
+        if (isJumping && jumpHeld)
         {
-            isJumping = false;
+            if (jumpHoldCounter > 0)
+            {
+                rb.linearVelocity = new Vector2(
+                    rb.linearVelocity.x,
+                    rb.linearVelocity.y + holdJumpForce * Time.deltaTime
+                );
+
+                jumpHoldCounter -= Time.deltaTime;
+            }
+            else
+            {
+                isJumping = false;
+            }
         }
-    }
 
         if (!isWallJumping)
         {
@@ -198,6 +234,7 @@ if (isJumping && jumpHeld)
     {
         moveInput = context.ReadValue<Vector2>();
     }
+
     private void OnJump(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -205,6 +242,8 @@ if (isJumping && jumpHeld)
             if (IsGrounded())
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, tapJumpHeight);
+
+                PlaySound(jumpSound);
 
                 isJumping = true;
                 jumpHeld = true;
@@ -255,7 +294,17 @@ if (isJumping && jumpHeld)
     }
     private void TryInteract()
     {
-        currentInteractable?.Interact();
+        CheckForInteractable(); // ← ADD THIS
+
+        if (currentInteractable != null)
+        {
+            Debug.Log("Calling interact on: " + currentInteractable.name);
+            currentInteractable.Interact();
+        }
+        else
+        {
+            Debug.Log("No interactable found");
+        }
     }
 
     private void CheckForInteractable()
@@ -288,7 +337,7 @@ if (isJumping && jumpHeld)
 
             if (hit != null)
             {
-                currentInteractable = hit.GetComponent<IInteractable>();
+                currentInteractable = hit.GetComponent<SimpleInteract>();
                 hit.GetComponent<InteractableVisual>()?.SetHighlight(true);
             }
             else
@@ -335,6 +384,7 @@ if (isJumping && jumpHeld)
                 Vector3 localScale = transform.localScale;
                 localScale.x *= -1f;
                 transform.localScale = localScale;
+                PlaySound(wallJumpSound);
             }
 
             yield return new WaitForSeconds(wallJumpingDuration);
@@ -372,6 +422,7 @@ if (isJumping && jumpHeld)
         IsDashing = true;
         CanDash = false;
 
+        PlaySound(dashSound);
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
 
@@ -410,6 +461,57 @@ if (isJumping && jumpHeld)
             Vector3 localScale = transform.localScale;
             localScale.x *= -1f;
             transform.localScale = localScale;
+        }
+    }
+
+    private void HandleFootsteps()
+    {
+        if (!IsGrounded() || Mathf.Abs(rb.linearVelocity.x) < 0.1f)
+        {
+            return;
+        }
+
+        // Dynamic step speed
+        float speedPercent = Mathf.Abs(rb.linearVelocity.x) / moveSpeed;
+        stepInterval = Mathf.Lerp(0.5f, 0.25f, speedPercent);
+
+        stepTimer -= Time.deltaTime;
+
+        if (stepTimer <= 0f && !audioSource.isPlaying) 
+        {
+            AudioClip stepSound = GetFootstepSound();
+            PlaySound(stepSound);
+
+            stepTimer = stepInterval;
+        }
+    }
+
+    private AudioClip GetFootstepSound()
+    {
+        Vector3 worldPos = groundCheck.position;
+
+        Vector3Int cellPosGrass = grassTilemap.WorldToCell(worldPos);
+        if (grassTilemap.HasTile(cellPosGrass))
+        {
+            return grassStepSound;
+        }
+
+        Vector3Int cellPosStone = stoneTilemap.WorldToCell(worldPos);
+        if (stoneTilemap.HasTile(cellPosStone))
+        {
+            return stoneStepSound;
+        }
+
+        return grassStepSound; // fallback
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.pitch = Random.Range(0.9f, 1.1f); // Sound variation
+            audioSource.PlayOneShot(clip);
+            audioSource.pitch = 1f;
         }
     }
 }

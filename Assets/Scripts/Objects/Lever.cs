@@ -1,21 +1,16 @@
 using UnityEngine;
 
-public class Lever : MonoBehaviour, IInteractable
+public class SimpleInteract : MonoBehaviour
 {
-    public bool isActivated = false;
-
-    [Header("Target")]
-    public FutureObject target; // what this affects
+    public GameObject[] enableObjects;
+    public GameObject[] disableObjects;
 
     public void Interact()
     {
-        if (isActivated) return;
+        foreach (var obj in enableObjects)
+            obj.SetActive(true);
 
-        // if (TimelineManager.Instance.currentTimeline != TimelineManager.Timeline.Past)
-        //     return;
-
-        isActivated = true;
-
-        target?.Activate();
+        foreach (var obj in disableObjects)
+            obj.SetActive(false);
     }
 }

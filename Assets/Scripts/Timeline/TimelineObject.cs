@@ -5,6 +5,7 @@ public class TimelineObject : MonoBehaviour
     public bool existsInPast = true;
     public bool existsInFuture = false;
     private FutureObject futureObject;
+    private bool isDestroyed = false;
 
     void Start()
     {
@@ -16,22 +17,22 @@ public class TimelineObject : MonoBehaviour
 
     void UpdateState(TimelineManager.Timeline timeline)
     {
+        if (isDestroyed)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
         bool shouldExist =
             (timeline == TimelineManager.Timeline.Past && existsInPast) ||
             (timeline == TimelineManager.Timeline.Future && existsInFuture);
 
-        if (futureObject != null && futureObject.IsActivated)
-        {
-            shouldExist = false;
-        }
-
         gameObject.SetActive(shouldExist);
-        Debug.Log($"Updating {gameObject.name}, shouldExist: {shouldExist}");
     }
 
-    void OnDestroy()
+    public void DestroyObject()
     {
-        if (TimelineManager.Instance != null)
-            TimelineManager.Instance.OnTimelineChanged -= UpdateState;
+        isDestroyed = true;
+        UpdateState(TimelineManager.Instance.currentTimeline);
     }
 }
