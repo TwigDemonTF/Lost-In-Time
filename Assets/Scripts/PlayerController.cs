@@ -38,6 +38,9 @@ public class PlayerController : MonoBehaviour
     public GameObject timelineA;
     public GameObject timelineB;
 
+    [SerializeField] private TimelineUIController timelineUI;
+    private bool isSwitchingTimeline = false;
+
     [SerializeField] private float dashSpeed = 10f;
     [SerializeField] private float dashingTime = 0.3f;
     [SerializeField] private float dashCooldown = 1f;
@@ -57,10 +60,22 @@ public class PlayerController : MonoBehaviour
     // AUDIO
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioSource musicSource;
 
+    [SerializeField] private AudioClip overworldMusic;
     [SerializeField] private AudioClip jumpSound;
     [SerializeField] private AudioClip wallJumpSound;
     [SerializeField] private AudioClip dashSound;
+
+    [Header("Volume Settings")]
+    [Range(0f, 1f)] public float masterVolume = 1f;
+
+    [Range(0f, 1f)] public float jumpVolume = 0.6f;
+    [Range(0f, 1f)] public float wallJumpVolume = 0.8f;
+    [Range(0f, 1f)] public float dashVolume = 0.7f;
+
+    [Range(0f, 1f)] public float footstepVolume = 0.5f;
+    [Range(0f, 1f)] public float musicVolume = 0.7f;
 
     // Walking sounds (per surface)
     [SerializeField] private AudioClip grassStepSound;
@@ -123,6 +138,14 @@ public class PlayerController : MonoBehaviour
 
         if (timelineA != null) timelineA.SetActive(true);
         if (timelineB != null) timelineB.SetActive(false);
+
+        musicSource.volume = musicVolume * masterVolume;
+        if (musicSource != null && overworldMusic != null)
+        {
+            musicSource.clip = overworldMusic;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
     }
 
     void OnDrawGizmos()
@@ -243,7 +266,7 @@ public class PlayerController : MonoBehaviour
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, tapJumpHeight);
 
-                PlaySound(jumpSound);
+                PlaySound(jumpSound, jumpVolume);
 
                 isJumping = true;
                 jumpHeld = true;
@@ -281,9 +304,9 @@ public class PlayerController : MonoBehaviour
     // Timeline switch using Input System
     private void OnSwitchTimeline(InputAction.CallbackContext context)
     {
-        if (TimelineManager.Instance != null)
+        if (!isSwitchingTimeline)
         {
-            TimelineManager.Instance.SwitchTimeline();
+            StartCoroutine(SwitchTimelineRoutine());
         }
     }
 
@@ -294,7 +317,7 @@ public class PlayerController : MonoBehaviour
     }
     private void TryInteract()
     {
-        CheckForInteractable(); // ← ADD THIS
+        CheckForInteractable();
 
         if (currentInteractable != null)
         {
@@ -342,7 +365,8 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                currentInteractable = null;            }
+                currentInteractable = null;
+            }
         }
     }
 
@@ -384,7 +408,7 @@ public class PlayerController : MonoBehaviour
                 Vector3 localScale = transform.localScale;
                 localScale.x *= -1f;
                 transform.localScale = localScale;
-                PlaySound(wallJumpSound);
+                PlaySound(wallJumpSound, wallJumpVolume);
             }
 
             yield return new WaitForSeconds(wallJumpingDuration);
@@ -422,7 +446,7 @@ public class PlayerController : MonoBehaviour
         IsDashing = true;
         CanDash = false;
 
-        PlaySound(dashSound);
+        PlaySound(dashSound, dashVolume);
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
 
@@ -477,10 +501,10 @@ public class PlayerController : MonoBehaviour
 
         stepTimer -= Time.deltaTime;
 
-        if (stepTimer <= 0f && !audioSource.isPlaying) 
+        if (stepTimer <= 0f) 
         {
             AudioClip stepSound = GetFootstepSound();
-            PlaySound(stepSound);
+            PlaySound(stepSound, footstepVolume);
 
             stepTimer = stepInterval;
         }
@@ -505,13 +529,28 @@ public class PlayerController : MonoBehaviour
         return grassStepSound; // fallback
     }
 
-    private void PlaySound(AudioClip clip)
+    private void PlaySound(AudioClip clip, float volume)
     {
         if (clip != null && audioSource != null)
         {
-            audioSource.pitch = Random.Range(0.9f, 1.1f); // Sound variation
-            audioSource.PlayOneShot(clip);
-            audioSource.pitch = 1f;
+            audioSource.pitch = Random.Range(0.9f, 1.1f);
+            audioSource.PlayOneShot(clip, volume * masterVolume);
         }
+    }
+
+    private IEnumerator SwitchTimelineRoutine()
+    {
+        isSwitchingTimeline = true;
+
+        // Play hourglass animation first
+        yield return StartCoroutine(timelineUI.PlayTimelineAnimation());
+
+        // Only switch after animation is finished
+        if (TimelineManager.Instance != null)
+        {
+            TimelineManager.Instance.SwitchTimeline();
+        }
+
+        isSwitchingTimeline = false;
     }
 }
