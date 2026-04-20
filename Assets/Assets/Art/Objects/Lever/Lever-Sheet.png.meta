@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 0eb82df06a10b1f40bac155f94b80e94
+guid: 6418e75afd314966b8aa0a7bbdd420eb
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8254087111080153237
-    second: __WallSlide_0
+      213: 5119340280440332875
+    second: Lever-Sheet_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +100,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: __WallSlide_0
+      name: Lever-Sheet_0
       rect:
         serializedVersion: 2
-        x: 47
-        y: 1
-        width: 24
-        height: 36
+        x: 0
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5901019de786c8270800000000000000
-      internalID: 8254087111080153237
+      spriteID: b42aef39cdc8b0740800000000000000
+      internalID: 5119340280440332875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lever-Sheet_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e45fb24ad8518ed483af89d8afa7502
+      internalID: -1774314794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lever-Sheet_2
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 617e7f89a5b346c41942558ec5cf2e57
+      internalID: 850003581
       vertices: []
       indices: 
       edges: []
@@ -125,7 +169,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 8c7bbd4ce2d62c883b2455cfa88043f0
     internalID: 0
     vertices: []
     indices: 
@@ -133,9 +177,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":32.0,"y":32.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      __WallSlide_0: 8254087111080153237
+      Lever-Sheet_0: 5119340280440332875
+      Lever-Sheet_1: -1774314794
+      Lever-Sheet_2: 850003581
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

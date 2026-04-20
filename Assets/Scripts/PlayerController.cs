@@ -85,7 +85,10 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float stepInterval = 0.4f;
     private float stepTimer;
-    
+
+    // Animation
+    private Animator animator;
+
     [SerializeField] Transform wallCheck;
     [SerializeField] LayerMask wallLayer;
     [SerializeField] private Transform groundCheck;
@@ -133,6 +136,7 @@ public class PlayerController : MonoBehaviour
     }
     void Start()
     {
+        animator = GetComponent<Animator>();
         rb = GetComponentInChildren<Rigidbody2D>();
         tr = GetComponent<TrailRenderer>();
 
@@ -210,6 +214,7 @@ public class PlayerController : MonoBehaviour
                     Time.deltaTime;
             }
         }
+        UpdateAnimations();
     }
 
     void FixedUpdate()
@@ -322,7 +327,14 @@ public class PlayerController : MonoBehaviour
         if (currentInteractable != null)
         {
             Debug.Log("Calling interact on: " + currentInteractable.name);
+
             currentInteractable.Interact();
+
+            InteractableVisual visual = currentInteractable.GetComponent<InteractableVisual>();
+            if (visual != null)
+            {
+                visual.CompleteInteraction();
+            }
         }
         else
         {
@@ -569,5 +581,12 @@ public class PlayerController : MonoBehaviour
         }
 
         isSwitchingTimeline = false;
+    }
+    private void UpdateAnimations()
+    {
+        animator.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
+        animator.SetBool("Grounded", IsGrounded());
+        animator.SetFloat("VerticalVelocity", rb.linearVelocity.y);
+        animator.SetBool("WallSliding", isWallSliding);
     }
 }
