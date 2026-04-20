@@ -11,6 +11,6 @@ public class SimpleInteract : MonoBehaviour
             obj.SetActive(true);
 
         foreach (var obj in disableObjects)
-            obj.SetActive(false);
+            Destroy(obj);
     }
 }

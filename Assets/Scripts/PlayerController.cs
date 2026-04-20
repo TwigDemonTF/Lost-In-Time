@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     private bool isWallJumping;
     private float wallJumpingDirection = 0.4f;
     private float wallJumpingDuration = 0.4f;
-    private Vector2 wallJumpingPower = new Vector2(7f, 9f); 
+    private Vector2 wallJumpingPower = new Vector2(4f, 9f); 
 
     // dash   
     private bool CanDash = true;
