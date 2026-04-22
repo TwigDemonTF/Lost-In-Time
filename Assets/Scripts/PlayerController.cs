@@ -20,7 +20,6 @@ public class PlayerController : MonoBehaviour
     private float wallSlidingSpeed = 2f;
     // WallJumping
     private bool isWallJumping;
-    private bool CanWallJump = true;
     private float wallJumpingDirection = 0.4f;
     private float wallJumpingDuration = 0.4f;
     private Vector2 wallJumpingPower = new Vector2(4f, 9f); 
@@ -402,11 +401,6 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator WallJump()
     {
-
-        if (!CanWallJump)
-        {
-            yield break; 
-        }
         if (isWallSliding)
         {
             isWallJumping = true;
@@ -428,18 +422,16 @@ public class PlayerController : MonoBehaviour
                 transform.localScale = localScale;
                 PlaySound(wallJumpSound, wallJumpVolume);
             }
-            CanWallJump = false;
+
             yield return new WaitForSeconds(wallJumpingDuration);
 
             StopWallJumping();
             isWallSliding = false;
-
         }
     }
 
     private void StopWallJumping()
     {
-        CanWallJump = true;
         isWallJumping = false;
     }
 
