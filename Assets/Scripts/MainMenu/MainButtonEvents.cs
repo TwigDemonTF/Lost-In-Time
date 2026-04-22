@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainButtonEvents : MonoBehaviour
+public class ButtonEvents : MonoBehaviour
 {
     public GameObject keybindCanvas;
     public GameObject mainCanvas;
