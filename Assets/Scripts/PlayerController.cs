@@ -568,11 +568,13 @@ public class PlayerController : MonoBehaviour
 
     private void PlaySound(AudioClip clip, float volume)
     {
-        if (clip != null && audioSource != null)
-        {
-            audioSource.pitch = Random.Range(0.9f, 1.1f);
-            audioSource.PlayOneShot(clip, volume * masterVolume);
-        }
+        if (clip == null) return;
+
+        AudioSource.PlayClipAtPoint(
+            clip,
+            transform.position,
+            volume * masterVolume
+        );
     }
 
     private IEnumerator SwitchTimelineRoutine()
