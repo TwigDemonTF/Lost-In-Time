@@ -329,6 +329,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Calling interact on: " + currentInteractable.name);
 
             currentInteractable.Interact();
+            currentInteractable.GetComponent<EndInteractHook>()?.OnInteracted();
 
             InteractableVisual visual = currentInteractable.GetComponent<InteractableVisual>();
             if (visual != null)
@@ -560,11 +561,13 @@ public class PlayerController : MonoBehaviour
 
     private void PlaySound(AudioClip clip, float volume)
     {
-        if (clip != null && audioSource != null)
-        {
-            audioSource.pitch = Random.Range(0.9f, 1.1f);
-            audioSource.PlayOneShot(clip, volume * masterVolume);
-        }
+        if (clip == null) return;
+
+        AudioSource.PlayClipAtPoint(
+            clip,
+            transform.position,
+            volume * masterVolume
+        );
     }
 
     private IEnumerator SwitchTimelineRoutine()
