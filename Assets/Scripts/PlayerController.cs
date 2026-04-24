@@ -330,7 +330,6 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Calling interact on: " + currentInteractable.name);
 
             currentInteractable.Interact();
-            currentInteractable.GetComponent<EndInteractHook>()?.OnInteracted();
 
             InteractableVisual visual = currentInteractable.GetComponent<InteractableVisual>();
             if (visual != null)
